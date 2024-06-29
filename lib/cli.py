@@ -23,6 +23,8 @@ def menu():
                 break  # Exit the loop
             case 1:
                 libraries = Library.get_all()
+                if  not libraries:
+                    print('\nThere are no Libraries at the moment\nAdd a new library with option `2`\n')
                 for lib in libraries:
                     print(f"ID: {lib[0]}, Name: {lib[1]}")
             case 2:
