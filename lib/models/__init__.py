@@ -1,4 +1,7 @@
 import sqlite3
 
-CONN = sqlite3.connect('archive.db')
-CURSOR = CONN.cursor()
+CONNECTION = sqlite3.connect('archive.db')
+CURSOR = CONNECTION.cursor()
+
+
+
