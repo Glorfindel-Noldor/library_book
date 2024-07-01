@@ -54,7 +54,7 @@ def add_book():
         else:
             book = Book(new_book, id_ or foreign_id)
             book.save()
-            print(f"{new_book}: ,{default_lib_mesg}")
+            print(f"{new_book}: ,{default_lib_msg}")
     except Exception as e: 
         print(e)
 
