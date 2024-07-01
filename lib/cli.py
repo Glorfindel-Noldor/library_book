@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.12
-
 import cli_pointers
 from models.library import Library
+from models.book import Book
 
 def menu():
     while True:
@@ -9,6 +9,7 @@ def menu():
         print('1.\tView all libraries')
         print('2.\tAdd a new library')
         print('3\tDelete existing library')
+        print('4\tAdd a new book!')
         switch = input('Select from the following menu: ')
 
         try:
@@ -31,8 +32,12 @@ def menu():
                 cli_pointers.name_library()
             case 3:
                 cli_pointers.delete_library_name()
+            case 4:
+                cli_pointers.add_book()
             case _:
                 print('Invalid choice')
+
+
 
 if __name__ == "__main__":
     menu()
