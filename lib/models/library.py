@@ -2,8 +2,9 @@ from models.__init__ import CONNECTION, CURSOR
 
 class Library:
 
-    all = []
-    print(all)
+
+
+
     def __init__(self, name, id_=None):
         self.name = name
         self.id_ = id_    
@@ -43,7 +44,7 @@ class Library:
         CURSOR.execute(sql, (self.name,))
         CONNECTION.commit()
         self.id = CURSOR.lastrowid
-#not try to add id in all here to look for validations later
+
     @classmethod
     def get_all(cls):
         '''Get all libraries from the database'''
@@ -51,3 +52,6 @@ class Library:
         CURSOR.execute(sql)
         return CURSOR.fetchall()
     
+
+
+

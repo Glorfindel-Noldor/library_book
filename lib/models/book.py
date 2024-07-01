@@ -35,7 +35,7 @@ class Book:
 
 
     def save(self):
-        """creat a book and save to the table of library """
+        """create a book and save to the table of library """
         sql = """
             INSERT INTO books (name, foreign_id ) VALUES ( ? , ? );
         """
@@ -47,7 +47,8 @@ class Book:
 
     @staticmethod
     def get_default_id():
-        '''grabs a defulat id from an existing library table '''
+        '''grabs a default id from an existing library table '''
+
         sql = """SELECT id FROM libraries LIMIT 1;"""
         CURSOR.execute(sql)
         id_ = CURSOR.fetchone()

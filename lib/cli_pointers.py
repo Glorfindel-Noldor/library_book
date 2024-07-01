@@ -2,7 +2,7 @@ from models.__init__ import CONNECTION , CURSOR
 from models.library import Library
 from models.book import Book
 
-default_lib_mesg = 'the library id you provied was not found. placed in default library'
+default_lib_msg = 'the library id you provided was not found. placed in default library'
 
 def quit_menu():
     print('Thank you, goodbye!')
