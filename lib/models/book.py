@@ -1,27 +1,19 @@
 from models.__init__ import CONNECTION, CURSOR
 
-
-error_message = 'There has yet to be a library to be created it seems. please create one before creating a book'
-
-
 class Book:
-    def __init__ (self, name,foreign_id = None, id_ = None ):
+    def __init__(self, name, foreign_id=None, id_=None):
         self.name = name
-        self.id_ = id_
         self.foreign_id = foreign_id or self.get_default_id()
-
+        self.id = id_
 
     @classmethod
     def drop_table(cls):
-        '''Drop the Book table for clearing purposes'''
         sql = "DROP TABLE IF EXISTS books;"
         CURSOR.execute(sql)
         CONNECTION.commit()
 
-
     @classmethod
     def create_table(cls):
-        '''Create the Books table'''
         sql = """
         CREATE TABLE IF NOT EXISTS books (
             id INTEGER PRIMARY KEY,
@@ -33,33 +25,33 @@ class Book:
         CURSOR.execute(sql)
         CONNECTION.commit()
 
-
     def save(self):
-        """create a book and save to the table of library """
-        sql = """
-            INSERT INTO books (name, foreign_id ) VALUES ( ? , ? );
-        """
-
+        sql = "INSERT INTO books (name, foreign_id) VALUES (?, ?);"
         CURSOR.execute(sql, (self.name, self.foreign_id))
         CONNECTION.commit()
         self.id = CURSOR.lastrowid
-        
 
     @staticmethod
     def get_default_id():
-        '''grabs a default id from an existing library table '''
-
-        sql = """SELECT id FROM libraries LIMIT 1;"""
+        sql = "SELECT id FROM libraries LIMIT 1;"
         CURSOR.execute(sql)
         id_ = CURSOR.fetchone()
-        if id_ :
-            return id_[0]
-        else :
-            print(error_message)
-            
-        
-        
+        return id_[0] if id_ else None
 
+    @classmethod
+    def get_all(cls):
+        sql = "SELECT * FROM books;"
+        CURSOR.execute(sql)
+        return CURSOR.fetchall()
 
+    @classmethod
+    def find_by_id(cls, id):
+        sql = "SELECT * FROM books WHERE id = ?;"
+        CURSOR.execute(sql, (id,))
+        return CURSOR.fetchone()
 
-
+    @classmethod
+    def delete_book(cls, id):
+        sql = "DELETE FROM books WHERE id = ?;"
+        CURSOR.execute(sql, (id,))
+        CONNECTION.commit()
