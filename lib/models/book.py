@@ -55,3 +55,4 @@ class Book:
         sql = "DELETE FROM books WHERE id = ?;"
         CURSOR.execute(sql, (id,))
         CONNECTION.commit()
+
