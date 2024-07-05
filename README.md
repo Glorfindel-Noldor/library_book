@@ -16,7 +16,8 @@ This application allows users to manage libraries and books via a Command Line I
 1. Clone the repository.
 2. Install dependencies with `pipenv install`.
 3. Run the seeding script with `python lib/seed.py` to set up the database.
-4. Start the application with `python lib/cli.py`.
+4. Run `chmod +x lib/cli.py`.
+5. Start application with `lib/cli.py`
 
 ## Usage
 Follow the on-screen prompts to navigate through the application and manage libraries and books.
