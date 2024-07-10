@@ -1,7 +1,6 @@
 from models.library import Library
 from models.book import Book
-import cli_pointers
-import ipdb
+import ipdb # type: ignore
 
 
 def run_seeding():
@@ -9,10 +8,8 @@ def run_seeding():
     Library.drop_table()
     Book.drop_table()
 
-    Library.create_library_table()
+    Library.create_table()
     Book.create_table()
-
-
 
     print("Database tables created successfully and data seeded.")
 
@@ -25,6 +22,3 @@ def run_seeding():
 
 if __name__ == "__main__":
     run_seeding()
-
-
-

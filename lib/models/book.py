@@ -1,23 +1,33 @@
 from models.__init__ import CONNECTION, CURSOR
 
 class Book:
-    def __init__(self, name, foreign_id=None, id_=None):
-        self.name = name
-        self.foreign_id = foreign_id or self.get_default_id()
-        self.id = id_
+
+    def __init__(self, author, year ,foreign_id, id=None):
+        self.author = author
+        self.year   = year
+        self.foreign_id = foreign_id
+        self.id = id
 
     @classmethod
     def drop_table(cls):
-        sql = "DROP TABLE IF EXISTS books;"
+        '''set our table/instance'''
+
+        sql = """
+            DROP TABLE IF EXISTS books;
+        """
+
         CURSOR.execute(sql)
         CONNECTION.commit()
 
     @classmethod
     def create_table(cls):
+        ''' create our sql instance/object columns/attributes '''
+
         sql = """
         CREATE TABLE IF NOT EXISTS books (
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            author TEXT NOT NULL,
+            year INTEGER,
             foreign_id INTEGER,
             FOREIGN KEY (foreign_id) REFERENCES libraries(id)
         );
@@ -26,33 +36,38 @@ class Book:
         CONNECTION.commit()
 
     def save(self):
-        sql = "INSERT INTO books (name, foreign_id) VALUES (?, ?);"
-        CURSOR.execute(sql, (self.name, self.foreign_id))
+        '''create an object/instance with attributes/rows'''
+
+        sql = """
+            INSERT INTO books (author , year)
+            VALUES (? , ?);
+        """
+
+        CURSOR.execute(sql, (self.author, self.year) )
         CONNECTION.commit()
-        self.id = CURSOR.lastrowid
 
-    @staticmethod
-    def get_default_id():
-        sql = "SELECT id FROM libraries LIMIT 1;"
-        CURSOR.execute(sql)
-        id_ = CURSOR.fetchone()
-        return id_[0] if id_ else None
 
     @classmethod
-    def get_all(cls):
-        sql = "SELECT * FROM books;"
-        CURSOR.execute(sql)
-        return CURSOR.fetchall()
+    def delete(cls, name):
+        '''delete a book by author'''
 
-    @classmethod
-    def find_by_id(cls, id):
-        sql = "SELECT * FROM books WHERE id = ?;"
-        CURSOR.execute(sql, (id,))
-        return CURSOR.fetchone()
+        sql = """
+            DELETE FROM books
+            WHERE author = ?;
+        """
 
+        CURSOR.execute(sql, (name, ) )
+        CONNECTION.commit()
+    
     @classmethod
-    def delete_book(cls, id):
-        sql = "DELETE FROM books WHERE id = ?;"
-        CURSOR.execute(sql, (id,))
+    def delete_all_in_lib(cls, lib_id):
+        '''delete all books with the same library id'''
+
+        sql = """
+            DELETE FROM books
+            WHERE foreign_id = ?
+        """
+
+        CURSOR.execute(sql, (lib_id, ) )
         CONNECTION.commit()
 
