@@ -1,12 +1,13 @@
 #!/usr/bin/env python3.12
-import lib.helpers as helpers
-from models.library import Library
-from models.book import Book
+from helpers import (view_libraries , add_library, delete_library)
+
 
 def menu():
     while True:
         print('0.\tQuit')
-
+        print('1.\tView libraries.')
+        print('2.\tAdd a library.')
+        print('3.\tDelete a library.')
         switch = input('Select from the following menu: ')
 
         try:
@@ -17,10 +18,21 @@ def menu():
 
         match switch:
             case 0:
-                helpers.quit_menu()
-                break  # Exit the loop
+                print('thank you goodbye')
+                return None
+            case 1:
+                view_libraries()
+            case 2:
+                add_library()
+            case 3:
+                delete_library()
             case _:
                 print('Invalid choice')
 
-if __name__ == "__main__":
+def main():
     menu()
+if __name__ == "__main__":
+    main()
+
+
+

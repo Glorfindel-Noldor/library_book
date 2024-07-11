@@ -3,10 +3,10 @@ from models.__init__ import CONNECTION, CURSOR
 class Library:
 
     def __init__(self, name, location, id=None):
-        self.name = name
-        self.location = location
-        self.id = id
-
+        self.name       = name
+        self.location   = location
+        self.id         = id
+    
     @classmethod
     def drop_table(cls):
         '''set our table/instance '''
@@ -40,24 +40,12 @@ class Library:
 
         sql = """
             INSERT INTO libraries (name , location)
-            VALUES (? , ?)
+            VALUES (? , ?);
         """
 
         CURSOR.execute(sql, (self.name, self.location) )
         CONNECTION.commit()
         self.id = CURSOR.lastrowid
-    
-    @classmethod
-    def fetch(cls):
-        '''fetch all libraries in Library class in sql'''
-
-        sql ="""
-            SELECT * FROM libraries;
-        """
-
-        CURSOR.execute(sql)
-        return CURSOR.fetchall()
-
 
     @classmethod
     def delete(cls, name):
@@ -65,11 +53,22 @@ class Library:
 
         sql = """
             DELETE FROM libraries
-            WHERE name = ?
+            WHERE name = ? ;
         """
 
         CURSOR.execute(sql, (name, ) )
         CONNECTION.commit()
+    
+    @classmethod
+    def fetch(cls):
+        '''fetch all libraries in Library class in sql'''
+
+        sql ="""
+            SELECT * FROM libraries ;
+        """
+
+        CURSOR.execute(sql)
+        return CURSOR.fetchall()
 
     @classmethod
     def get_lib_id_from_name(cls, name):
@@ -80,6 +79,19 @@ class Library:
             WHERE name = ?;
         """
 
-        CURSOR.execute(sql, (name ) )
+        CURSOR.execute(sql, (name, ) )
         name_x = CURSOR.fetchone()
         return name_x[0] if name_x else None
+
+
+
+    @classmethod
+    def get_lib_by_name(cls, lib_name):
+        '''looking for one specific library'''
+
+        sql = """SELECT name FROM libraries WHERE name = ? """
+        CURSOR.execute(sql, (lib_name,))
+        result = CURSOR.fetchone()
+        return result[0] if result else None
+
+
