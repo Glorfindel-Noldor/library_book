@@ -38,6 +38,7 @@ def add_library():
                 print('invalide choice, type `y` or `n` ')
 
 def visit_library(selected_library):
+    clear_menu('clear')
     library = Library.find_by_name(selected_library)
     if not library:
         print("Library not found")
@@ -47,11 +48,6 @@ def visit_library(selected_library):
     location = library.location
 
     books = library.books()
-    if not books:
-        print('No books')
-    else:
-        for i, book in enumerate(books, start=1):
-            print(f"[{i}]\t{book.book_name}")
 
     while True:
         print(f"\t\t\tLibrary Name:\t{name}")
@@ -61,9 +57,16 @@ def visit_library(selected_library):
         print('u) Update info')
         print('a) Add a book')
         print('d) Delete this library')
-
+        print('select a book to view by the number associated next to it.')
+        if not books:
+            print('No books')
+        else:
+            for i, book in enumerate(books, start=1):
+                print(f"[{i}]\t{book.book_name}")
         try:
+
             switch = input('Choose an option....\n:')
+
             match switch:
                 case 'u':
                     update_library(id)
@@ -71,11 +74,14 @@ def visit_library(selected_library):
                     add_book(id)
                 case 'd':
                     delete_library(id)
+                case int(switch):
+                    view_book(switch)
                 case '0':
                     from cli import menu
                     return menu()
                 case _:
                     raise ValueError
+            
         except ValueError:
             print('Selection must be string based or must be an option')
 
@@ -106,8 +112,6 @@ def update_library(lib_id):
         print('Name and location must be strings')
     visit_library(new_name)
 
-#----------------------------------------
-
 def delete_library(lib_id):
     pass
 
@@ -126,8 +130,20 @@ def add_book(foreign_id):
     else:
         print('Failed to add book')
 
+#----------------------------------------
+
+
 def view_book(book_id):
-    pass
+    clear_menu('clear')
+    while True:
+        print('viewing book you selected')
+
+
+
+
+
+
+
 
 def update_book(book_id):
     pass

@@ -12,8 +12,9 @@ def run_seeding():
 
     lib1 = Library.create('Alexandria', 'Egypt')
     lib2 = Library.create('Damascus', 'Syria')
-    
 
+    book1 = Book.create('author name', 'name of book', 1889, lib2.id)
+    book2 = Book.create('another author', 'the name of book', 1998, lib2.id)
 
 
 
