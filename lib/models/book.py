@@ -141,3 +141,13 @@ class Book:
         row = CURSOR.execute(sql, (book_name,)).fetchone()
         return cls.instance_from_db(row) if row else None
 
+    @classmethod
+    def find_by_foreign_id(cls, fid):
+        sql = """
+            SELECT * FROM books
+            WHERE foreign_id = ?;
+        """
+    
+        rows = CURSOR.execute(sql, (fid, )).fetchall()
+        return [cls.instance_from_db(row) for row in rows]
+    
