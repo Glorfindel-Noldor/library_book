@@ -1,13 +1,19 @@
 #!/usr/bin/env python3.12
-from helpers import (view_libraries , add_library, delete_library)
+import os
+from seed import run_seeding
+from helpers import (
+    add_library,
+    choosing_library
+)
 
 
 def menu():
+    os.system('clear')
     while True:
         print('0.\tQuit')
-        print('1.\tView libraries.')
-        print('2.\tAdd a library.')
-        print('3.\tDelete a library.')
+        print('1.\tAdd Library')
+        print('2.\tVisit Library.')
+
         switch = input('Select from the following menu: ')
 
         try:
@@ -17,22 +23,18 @@ def menu():
             continue  # Ask for input again
 
         match switch:
-            case 0:
-                print('thank you goodbye')
-                return None
             case 1:
-                view_libraries()
-            case 2:
                 add_library()
-            case 3:
-                delete_library()
+            case 2:
+                choosing_library()
+            case 0:
+                print('thank you, goodbye')
+                return
             case _:
                 print('Invalid choice')
 
 def main():
+    run_seeding()
     menu()
 if __name__ == "__main__":
     main()
-
-
-

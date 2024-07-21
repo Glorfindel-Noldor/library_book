@@ -2,136 +2,148 @@ from os import system as clear_menu
 from models.library import Library
 from models.book import Book
 
-def view_libraries():
-    clear_menu('clear')
-    libraries = Library.fetch()
-    if libraries:
-        print('name:\t\t\tlocation:')
-        for lib in libraries:
-            print(f"{lib[1]}\t:\t{lib[2]}")
-    else:
-        print('there are no libraries, try creating one with option `2`')
+def choosing_library():
+    lib_list = Library.get_all()
+    if not lib_list:
+        print('no libraries, try creating one first!')
         return
+    for i , lib in enumerate(lib_list, start=1):
+        print(f"[{i}]\t{lib.name}")
     
     try:
-        name_of_library = input('\nEnter name of library you`d like to visit.\n:').lower()
-        library = Library.get_lib_by_name(name_of_library)
-        if library:
-            enter_library(name_of_library)
-            print('name:\t\t\tlocation:')
-            for lib in libraries:
-                print(f"{lib[1]}\t:\t{lib[2]}")
-        else:
+        selection = int(input('select the number next to the library in which you`d like to visit.'))-1
+        if 1 > selection > len(lib_list):
             raise ValueError
+        visit_library(lib_list[selection].name)
     except ValueError:
-        print('library not found. ')
-
-def enter_library(lib_name):
-
-
-     from cli import menu
-     #the user brings name_of_library here from view_libraries as lib_name
-     lib_id = Library.get_lib_id_from_name(lib_name)
-    # now that that lib_name is now lib_id we can bring all books of same foreign id
-     fetch_books =  Book.fetch_by_foreign_id(lib_id)
-    #fetch books is a list of books
-
-     while True:
-#        if fetch_books != []:
-#            for book in fetch_books:
-#                print(f"Author: {book[1]} Title: {book[2]}")
-#        else: None
-        print('1. add a book')
-        print('2. delete a book')
-        print('3. view all books')
-        print('4. go back ')
-        try:
-            switch = int(input('make a choice...\t'))
-        except ValueError:
-            print('must be int not str choice')
-            continue
-
-        match switch:
-            case 1:
-                add_a_book(lib_id)
-                #we will need the 'lib_id' as a foreign_id
-            case 2:
-                 delete_book(lib_id) if fetch_books else print('no books to delete try adding one')
-            case 3:
-                view_all_books(lib_id)
-            case 4:
-                menu()
-            case _:
-                print('not an option.')
+        print('the selection must be integer value or with in range')
 
 def add_library():
-    new_name     = input('name of library.\n:').lower()
-    new_location = input('where is this library located?\n:').lower()
+    try:
+        name = input('what is the name of the library?\n:')
+        location = input('where is this library located (country only)?\n:')
+        if not (name, location):
+            raise ValueError
+        Library.create(name, location)
+    except ValueError:
+        print('please enter name and location of library....')
+    while True:
+        go_to = input('go to this library now ?\n(y/n)\t').lower()
+        match go_to:
+            case ('y' | 'yes'):
+                visit_library(name)
+            case ('n' | 'no'):
+                return
+            case _:
+                print('invalide choice, type `y` or `n` ')
 
-    if isinstance((new_name), str) and  isinstance( new_location, str):
-        new_library = Library(new_name, new_location)
-        new_library.save()
-        print(f"new library {new_name} created in {new_location}!")
-    else:
-        print('please enter str nothing was created.')
+def visit_library(selected_library):
+    library = Library.find_by_name(selected_library)
+    if not library:
+        print("Library not found")
         return
+    id = library.id
+    name = library.name
+    location = library.location
 
-def add_a_book(lib_id_as_foreign_id):
-    
-    author = input('name of author\t:').lower()
-    book_name = input('name of book\t:').lower()
-    year= input('year book came out\t:')
-    
-    new_book= Book(author, book_name, year, lib_id_as_foreign_id)
-    new_book.save()
-
-def view_all_books(lib_id):
-    books = Book.fetch_by_foreign_id(lib_id)
+    books = library.books()
     if not books:
-        print('no books yet, try adding some ?')
+        print('No books')
     else:
-        print('author\t:\tname of book')
-        for book in books:
-            print(f"{book[1]}\t:\t{book[2]}")
+        for i, book in enumerate(books, start=1):
+            print(f"[{i}]\t{book.book_name}")
 
-def delete_book(lib_id):
+    while True:
+        print(f"\t\t\tLibrary Name:\t{name}")
+        print(f"\t\t\tLocation:\t{location}")
 
-    show_me_all_books = Book.fetch_by_foreign_id(lib_id)
-    if not show_me_all_books:
-        print('\nno books to delete...\n')
-    for lib in show_me_all_books:
-        print(f"author: {lib[1]}\tname of book: {lib[2]}")
-    if show_me_all_books:
-        deleted_by_name = input('name of book you`d like to delete please.\n:').lower()
-    else:
-        return ValueError
-    try:
-        Book.delete(deleted_by_name)
-    except ValueError:
-        print('That book does not exist here check other libraries perhaps.')
+        print('0) Go back')
+        print('u) Update info')
+        print('a) Add a book')
+        print('d) Delete this library')
 
-def delete_library():
-    list_of_libraries = Library.fetch()
-    if not list_of_libraries:
-        print('no libraries to delete. try adding one first with option `1`')
+        try:
+            switch = input('Choose an option....\n:')
+            match switch:
+                case 'u':
+                    update_library(id)
+                case 'a':
+                    add_book(id)
+                case 'd':
+                    delete_library(id)
+                case '0':
+                    from cli import menu
+                    return menu()
+                case _:
+                    raise ValueError
+        except ValueError:
+            print('Selection must be string based or must be an option')
+
+def update_library(lib_id):
+    old_info = Library.find_by_id(lib_id)
+    if not old_info:
+        print("Library not found")
         return
-    print('name:\t\t\tlocation:')
-    for lib in list_of_libraries:
-        print(f"{lib[1]}\t:\t{lib[2]} ")
     
-    try:
+    old_name    = old_info.name
+    old_location= old_info.location
 
-        to_delete = input('which library would you like to delete?\n:').lower()
-        lib_id = Library.get_lib_id_from_name(to_delete)
-        double_check = input('warning if you delete this library you will also delete the books in it, are you sure?\n( y / n ):\t').lower()
-        if double_check.lower() == ('y' or 'yes'):
-            Book.delete_all_in_lib(lib_id)
-            Library.delete(to_delete)
-            print('DELETED LIBRARY AND ANY BOOKS IN IT!')
-        elif double_check.lower() == ('n' or 'no'):
-            print('nothing deleted!')
-        else:
-            print('error in choice nothing deleted')
-    except ValueError:
-        print('Library not found')
+    try:
+        new_name    = input('New name of library:\t')
+        new_location= input('New location of library:\t')
+
+        if not new_name:
+            new_name        = old_name
+        if not new_location:
+            new_location    = old_location
         
+        old_info.name       = new_name    #look into their attribute to change
+        old_info.location   = new_location#look into their attribute to change
+        old_info.update()
+
+
+    except ValueError:
+        print('Name and location must be strings')
+    visit_library(new_name)
+
+#----------------------------------------
+
+def delete_library(lib_id):
+    pass
+
+def add_book(foreign_id):
+    try:
+        author = input('Author of book\n:')
+        book_name = input('Name of book\n:')
+        year = int(input('Year it came out\n:'))
+    except ValueError:
+        print('Incorrect value for year')
+        return  # Exit the function if there's an error
+
+    new_book = Book.create(author, book_name, year, foreign_id)
+    if new_book:
+        print('Book added successfully!')
+    else:
+        print('Failed to add book')
+
+def view_book(book_id):
+    pass
+
+def update_book(book_id):
+    pass
+
+def delete_book(book_id):
+    pass
+
+def view_all_books(foreign_id):
+    pass
+
+
+
+
+
+
+
+
+
+

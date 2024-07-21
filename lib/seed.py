@@ -1,19 +1,27 @@
-from models.library import Library
-from models.book import Book
-import ipdb # type: ignore
-
-
 def run_seeding():
-    # Create tables
+    from models.library import Library
+    from models.book import Book
+
+
+    #Create tables
     Library.drop_table()
     Book.drop_table()
-
+    
     Library.create_table()
     Book.create_table()
 
-    print("Database tables created successfully and data seeded.")
+    lib1 = Library.create('Alexandria', 'Egypt')
+    lib2 = Library.create('Damascus', 'Syria')
+    
 
-    ipdb.set_trace()
+
+
+
+
+
+
+
+    print("Database tables created successfully and data seeded.")
 
 
 
