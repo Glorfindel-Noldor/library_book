@@ -50,14 +50,11 @@ def visit_library(selected_library):
     if not library:
         print("Library not found")
         return
-    id = library.id
-    name = library.name
-    location = library.location
 
     while True:
-        books = library.books()  # Fetch books within the loop to refresh the list after any changes
-        print(f"\t\t\tLibrary Name:\t{name}")
-        print(f"\t\t\tLocation:\t{location}")
+        books = library.books()
+        print(f"\t\t\tLibrary Name:\t{library.name}")
+        print(f"\t\t\tLocation:\t{library.location}")
 
         print('b) Go back')
         print('u) Update library info')
@@ -76,16 +73,16 @@ def visit_library(selected_library):
             switch = int(switch)
             if 1 <= switch <= len(books):
                 view_book(books[switch - 1].id)
-                continue  # Continue after viewing a book to avoid the match case below
+                continue 
         
         match switch:
             case 'u':
-                update_library(id)
+                update_library(library.id)
             case 'a':
-                add_book(id)
+                add_book(library.id)
             case 'd':
-                delete_library(id)
-                return  # Exit after deleting the library
+                delete_library(library)
+                return  
             case 'b':
                 from cli import menu
                 return menu()
@@ -93,49 +90,40 @@ def visit_library(selected_library):
                 print('Invalid choice, must be a valid option')
 
 def update_library(lib_id):
-    old_info = Library.find_by_id(lib_id)
-    if not old_info:
+    library = Library.find_by_id(lib_id)
+    if not library:
         print("Library not found")
         return
     
-    old_name    = old_info.name
-    old_location= old_info.location
-
     try:
-        old_author    = input('New name of library:\t')
-        new_location= input('New location of library:\t')
+        new_name = input('New name of library:\t')
+        new_location = input('New location of library:\t')
 
-        if not old_author:
-            old_author        = old_name
-        if not new_location:
-            new_location    = old_location
+        if new_name:
+            library.name = new_name
+        if new_location:
+            library.location = new_location
         
-        old_info.name       = old_author    #look into their attribute to change
-        old_info.location   = new_location#look into their attribute to change
-        old_info.update()
-
-
+        library.update()
+        print('Library updated successfully!')
     except ValueError:
         print('Name and location must be strings')
-    visit_library(old_author)
+    visit_library(library.id)
 
-def delete_library(lib_id):
-
+def delete_library(library):
     try:
-        switch = input('are you sure you want to delete this?\n Doing so will also delete books in library.\n(y/n):\t').lower()
-        if switch in ('y' or 'yes'):
-            lib = Library.find_by_id(lib_id)
-            books = Book.find_by_foreign_id(lib_id)
-            for book in books:
+        switch = input('Are you sure you want to delete this? Doing so will also delete books in the library. (y/n):\t').lower()
+        if switch in ('y', 'yes'):
+            for book in library.books():
                 book.delete()
-            lib.delete()
+            library.delete()
             print('DELETED!')
-        elif switch in ('n' or 'no'):
-            print('nothing was deleted')
-            return
-        else: raise ValueError
+        elif switch in ('n', 'no'):
+            print('Nothing was deleted')
+        else:
+            raise ValueError
     except ValueError:
-        print('option not acceptable, nothing deleted.')
+        print('Option not acceptable, nothing deleted.')
 
 def add_book(foreign_id):
     try:
@@ -150,75 +138,60 @@ def add_book(foreign_id):
             raise ValueError
     except ValueError:
         print('Incorrect value for year or values left blank')
-        return  # Exit the function if there's an error
 
 def view_book(book_id):
     clear_menu('clear')
     book = Book.find_by_id(book_id)
     if not book:
-        print('book not found')
+        print('Book not found')
         return
-    library_id = book.foreign_id
-    book_id = book.id
-    name = book.book_name
-    author = book.author
-    year = book.year
     while True:
-        print(f"name of book: {name}\nauthor: {author}\nyear released: {year}")
-        print('u) update')
-        print('d) delete')
-        print('b) go back')
+        print(f"Name of book: {book.book_name}\nAuthor: {book.author}\nYear released: {book.year}")
+        print('u) Update')
+        print('d) Delete')
+        print('b) Go back')
         try:
-            switch = input('choose an option\n:')
+            switch = input('Choose an option\n:')
 
             match switch:
                 case 'u':
-                    update_book(book_id)
+                    update_book(book.id)
                 case 'd':
                     delete_book(book)
                     return
                 case 'b':
-                    visit_library(library_id)
+                    visit_library(book.foreign_id)
                 case _:
-                    print('must be letter option')
+                    print('Must be a letter option')
         except ValueError:
-            print('not an option')
+            print('Not an option')
 
 def update_book(book_id):
-    old_info = Book.find_by_id(book_id)
-    if not old_info:
+    book = Book.find_by_id(book_id)
+    if not book:
         print("Book not found")
         return
     
-    old_author      = old_info.author
-    old_book_name   = old_info.book_name
-    old_year        = old_info.year
-    # foreign_id:  this never has to be questioned and is implicitly brought in
     try:
-        update_author    = input('update author`s name:\t')
-        update_book_name= input('update book name:\t')
-        update_year     = input('update year book came out:\t')
-        if not update_author:
-            update_author = old_author
-        if not update_book_name:
-            update_book_name = old_book_name
-        if not update_year:
-            update_year = old_year
-        else:
-            update_year = int(update_year)
-        
-        old_info.author = update_author
-        old_info.book_name = update_book_name
-        old_info.year = update_year
-        old_info.update()
+        new_author = input('Update author\'s name:\t')
+        new_book_name = input('Update book name:\t')
+        new_year = input('Update year book came out:\t')
 
-        print('book updated successfully!')
+        if new_author:
+            book.author = new_author
+        if new_book_name:
+            book.book_name = new_book_name
+        if new_year:
+            book.year = int(new_year)
+
+        book.update()
+        print('Book updated successfully!')
     except ValueError:
-        print('year must be int value ')
+        print('Year must be an int value')
 
 def delete_book(book):
     try:
-        switch = input('delete ? (y/n)').lower()
+        switch = input('Delete? (y/n)').lower()
         if switch in ('y', 'yes'):
             book.delete()
             visit_library(book.foreign_id)
@@ -227,4 +200,4 @@ def delete_book(book):
         else: 
             raise ValueError
     except ValueError:
-        print('error in deleting book option not accepted')
+        print('Error in deleting book option not accepted')
